@@ -507,4 +507,176 @@ db.collection.aggregate([
 
 
 
+db.collection.aggregate([
+  {
+    "$project": {
+      "name": 1,
+      "age": 1,
+      "_id": 0
+    }
+  }
+])
+
+ ΕΜΦΑΝΊΖΕΙ NAME , AGE
+
+db.collection.aggregate([
+  {
+    "$sort": {
+      "age": 1
+    }
+  }
+]) 
+Κανει sort Age και εμφανίζει 
+id 2 < id 1 < id 8 < id 3 < id 6 < id 5 < id 4 < id 7
+
+
+db.collection.aggregate([
+  {
+    "$sort": {
+      "age": 1
+    }
+  },
+  {
+    "$project": {
+      "name": 1,
+      "age": 1,
+      "_id": 0
+    }
+  }
+]) ΚΑΝΕΙ ΤΑ 2 ΒΗΜΑΤΑ ΠΙΟ ΠΑΝΩ ΚΑΙ ΜΟΥ ΕΜΦΑΝΙΖΕΙ ΜΟΝΟ ΤΟ NAME KAI AGE ΤΩΝ ID 2 < 1 < 8 < 3 < 6 < 5 < 4 <7
+
+
+ΕΔΩ Η ΔΙΑΦΟΡΕΤΙΚΗ ΣΕΙΡΑ ΕΧΕΙ ΔΙΑΦΟΡΑ????
+ΟΧΙ !!
+ΓΙΑΤΙ ΚΡΑΤΑΕΙ ΠΡΩΤΑ ΤΟ NAME kai to Age και μετά sortarei 
+
+ΕΔΩ ΔΕΝ ΕΧΕΙ ΔΙΑΦΟΡΑ Η ΣΕΙΡΑ
+
+
+
+db.collection.aggregate([
+  {
+    "$project": {
+      "name": 1,
+      "city": 1,
+      "_id": 0
+    }
+  }
+])
+
+ΚΡΑΤΑΩ ΜΟΝΟ NAME K CITY ΚΑΙ ΘΕΛΩ ΝΑ SORTΑΡΩ ΜΕ ΗΛΙΚΙΑ ΑΥΞΟΥΣΑ . 
+ΕΧΕΙ ΔΙΑΦΟΡΑ ΠΟΥ ΘΑ ΒΑΛΩ ΤΟ SORT κΑΙ ΓΙΑΤΙ??
+
+
+
+db.collection.aggregate([
+  {
+    "$sort": {
+      "age": 1
+    }
+  },
+  {
+    "$project": {
+      "name": 1,
+      "city": 1,
+      "_id": 0
+    }
+  }
+])
+
+[
+  {
+    "city": "Rethymno",
+    "name": "George"
+  },
+  {
+    "city": "Athens",
+    "name": "Maria"
+  },
+  {
+    "city": "Patra",
+    "name": "Panagiotis"
+  },
+  {
+    "city": "Chalkida",
+    "name": "Nikos"
+  },
+  {
+    "city": "Athens",
+    "name": "George"
+  },
+  {
+    "city": "Athens",
+    "name": "Kostas"
+  },
+  {
+    "city": "Patra",
+    "name": "Konstantina"
+  },
+  {
+    "city": "Patra",
+    "name": "Andreas"
+  }
+]
+
+ΠΡΩΤΟ ΒΗΜΑ SORTAREI ΜΕ ΗΛΙΚΙΑ ID 2 < 1 < 8 < 3 < 6 < 5 < 4 <7
+ΚΑΙ ΔΕΥΤΕΡΟ ΒΗΜΑ ΑΦΟΥ ΕΧΕΙ SORTAREI ΘΑ ΜΟΥ ΕΜΦΑΝΙΣΕΙ ΤΟ CITY ΚΑΙ NAME.
+
+ΝΑ ΔΟΥΜΕ ΟΜΩΣ ΤΗΝ ΑΝΤΙΘΕΤΗ ΣΕΙΡΑ.
+
+db.collection.aggregate([
+  {
+    "$project": {
+      "name": 1,
+      "city": 1,
+      "_id": 0
+    }
+  },
+  {
+    "$sort": {
+      "age": 1
+    }
+  }
+])
+
+[
+  {
+    "city": "Athens",
+    "name": "Maria"
+  },
+  {
+    "city": "Rethymno",
+    "name": "George"
+  },
+  {
+    "city": "Chalkida",
+    "name": "Nikos"
+  },
+  {
+    "city": "Patra",
+    "name": "Konstantina"
+  },
+  {
+    "city": "Athens",
+    "name": "Kostas"
+  },
+  {
+    "city": "Athens",
+    "name": "George"
+  },
+  {
+    "city": "Patra",
+    "name": "Andreas"
+  },
+  {
+    "city": "Patra",
+    "name": "Panagiotis"
+  }
+] 
+ΠΟΥ ΠΡΟΦΑΝΩΣ ΕΙΝΑΙ ΛΑΘΟΣ ΤΟ SORTΑΡΙΣΜΑ - ΕΑΝ ΔΕΊΤΕ ΤΗΝ DATABASE- 
+ΓΙΑΤΙ ΕΧΟΥΜΕ ΑΥΤΟ ΛΑΘΟΣ.
+ΓΙΑΤΙ ΠΡΩΤΑ ΚΡΑΤΑΕΙ NAME ΚΑΙ CITY ΜΟΝΟ !!! ΚΑΙ ΜΕΤΑ ΤΟΥ ΛΕΜΕ ΝΑ SORTΑΡΕΙ ΚΑΤΑ ΗΛΙΚΙΑ ΠΟΥ ΟΜΩΣ ΔΕΝ ΥΠΆΡΧΕΙ ΤΗΝ ΣΤΙΓΜΉ ΠΟΥ ΤΟ ΖΗΤΑΜΕ
+ΟΠΟΤΕ ΟΥΣΙΑΣΤΙΚΆ ΕΜΦΑΝΊΖΕΙ ΤΟΝ ΠΙΝΑΚΑ ΤΟΥ ΠΡΩΤΟΥ ΒΗΜΑΤΟΣ ΔΗΛΑΔΗ ΠΟΥ ΚΡΑΤΆΕΙ NAME κΑΙ CITY.
+
+
 
