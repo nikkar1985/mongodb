@@ -32,6 +32,22 @@ https://www.mongoplayground.net/
     "city": "Patra",
     "status": "active",
     "balance": 1111
+  },
+  {
+    "_id": 5,
+    "name": "Kostas",
+    "age": 44,
+    "city": "Athens",
+    "status": "active",
+    "balance": 2222
+  },
+  {
+    "_id": 6,
+    "name": "George",
+    "age": 33,
+    "city": "Athens",
+    "status": "inactive",
+    "balance": 2223
   }
 ]
 
@@ -40,8 +56,34 @@ queries :
 
 db.collection.find({}) //ΧΩΡΙΣ ΦΙΛΤΡΟ
 
+db.collection.find({
+  "city": "Athens"
+}) 
+
 
 db.collection.find({
   "city": "Athens",
   "status": "active"
 }) // Διπλό φίλτρο , σαν το λογικο ΚΑΙ AND &&
+
+
+db.collection.find({
+  "age": {
+    "$gt": 30
+  }
+}) //greater than 30 >30
+
+db.collection.find({
+  "age": {
+    "$lt": 30
+  }
+}) // less than 30 <30
+
+db.collection.find({
+  "city": {
+    "$in": [
+      "Athens",
+      "Patra"
+    ]
+  }
+}) // εναλλακτικός τρόπος για το OR  .ψάχνει  πόλη Αθήνα ή Πάτρα
