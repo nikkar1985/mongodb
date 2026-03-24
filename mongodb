@@ -397,4 +397,114 @@ db.collection.aggregate([
 Σε τρίτο βήμα κάνω sort με ηλικία οπότε συγκρίνω μόνο τις επαφές 1 και 4 και τις sortάρω ως εξής ID 1 < ID 4
 
 
+db.collection.aggregate([
+  {
+    "$project": {
+      "name": 1,
+      "city": 1
+    }
+  }
+])
+
+[
+  {
+    "_id": 1,
+    "city": "Athens",
+    "name": "Maria"
+  },
+  {
+    "_id": 2,
+    "city": "Rethymno",
+    "name": "George"
+  },
+  {
+    "_id": 3,
+    "city": "Chalkida",
+    "name": "Nikos"
+  },
+  {
+    "_id": 4,
+    "city": "Patra",
+    "name": "Konstantina"
+  },
+  {
+    "_id": 5,
+    "city": "Athens",
+    "name": "Kostas"
+  },
+  {
+    "_id": 6,
+    "city": "Athens",
+    "name": "George"
+  },
+  {
+    "_id": 7,
+    "city": "Patra",
+    "name": "Andreas"
+  },
+  {
+    "_id": 8,
+    "city": "Patra",
+    "name": "Panagiotis"
+  }
+]
+
+ΕΝΩ ΕΜΕΙΣ ΕΠΙΛΕΞΑΜΕ 2 KEYS City KAI ΝΑΜΕ μας εμφάνισε ID, City και Νame. ΓΙΑΤΙ?????
+ΟΤΑΝ ΒΑΖΩ 1 ΣΕ ΚΑΠΟΙΑ ΠΕΔΙΑ ΟΠΩΣ ΕΔΩ ΤΟ CITY κΑΙ ΤΟ NAME η mongodb καταλαβαίνει ότι πρέπει να εμφανίσει μόνο αυτά τα στοιχεία και 
+να κρύψει τα υπόλοιπα (Inclusion - Συμπερίληψη στα Ελληνικά)
+ΕΞΑΙΡΕΣΗ είναι το ID. Εμφανίζεται από ΠΡΟΕΠΙΛΟΓΗ τησ MONGODB.
+
+
+db.collection.aggregate([
+  {
+    "$project": {
+      "name": 1,
+      "city": 1,
+      "_id": 0
+    }
+  }
+])
+
+[
+  {
+    "city": "Athens",
+    "name": "Maria"
+  },
+  {
+    "city": "Rethymno",
+    "name": "George"
+  },
+  {
+    "city": "Chalkida",
+    "name": "Nikos"
+  },
+  {
+    "city": "Patra",
+    "name": "Konstantina"
+  },
+  {
+    "city": "Athens",
+    "name": "Kostas"
+  },
+  {
+    "city": "Athens",
+    "name": "George"
+  },
+  {
+    "city": "Patra",
+    "name": "Andreas"
+  },
+  {
+    "city": "Patra",
+    "name": "Panagiotis"
+  }
+]
+
+ΕΊΝΑΙ Η ΜΟΝΗ ΕΞΑΙΡΕΣΗ ΠΟΥ ΜΠΟΡΕΙ ΝΑ ΜΠΕΙ ΤΟ 0 ΚΑΙ ΤΟ 1 ΤΑΥΤΟΧΡΟΝΑ ΣΤΟ ΙΔΙΟ ΠΕΔΙΟ.
+ΓΙΑΤΙ ΠΡΟΑΝΑΦΕΡΑΜΕ ΌΤΙ ΔΕΊΧΝΕΙ ΟΣΑ ΕΧΟΥΝ 1 ΚΑΙ ΚΡΥΒΕΙ ΤΑ ΥΠΟΛΟΙΠΑ ΧΩΡΙΣ ΝΑ ΒΑΛΟΥΜΕ 0.
+
+ΠΡΟΣΟΧΗ ΜΟΝΟ ΤΟ ID ΜΠΟΡΕΙ ΝΑ ΠΑΡΕΙ 0 ΚΑΙ ΝΑ "ΕΞΑΦΑΝΙΣΤΕΙ" ΤΑ ΥΠΟΛΟΙΠΑ ΕΞΑΦΑΝΙΖΟΝΤΑΙ ΕΑΝ ΔΕΝ ΔΗΛΩΘΟΥΝ ΣΑΝ 1
+
+
+
 
