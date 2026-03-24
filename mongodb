@@ -1,0 +1,41 @@
+https://www.mongoplayground.net/
+
+[
+  {
+    "_id": 1,
+    "name": "Maria",
+    "age": 30,
+    "city": "Athens",
+    "status": "active",
+    "balance": 200
+  },
+  {
+    "_id": 2,
+    "name": "George",
+    "age": 22,
+    "city": "Rethymno",
+    "status": "inactive",
+    "balance": 222
+  },
+  {
+    "_id": 3,
+    "name": "Nikos",
+    "age": 33,
+    "city": "Chalkida",
+    "status": "active",
+    "balance": 500
+  },
+  {
+    "_id": 4,
+    "name": "Konstantina",
+    "age": 55,
+    "city": "Patra",
+    "status": "active",
+    "balance": 1111
+  }
+]
+
+
+queries :
+
+db.collection.find({}) //ΧΩΡΙΣ ΦΙΛΤΡΟ
