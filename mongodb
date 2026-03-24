@@ -230,3 +230,171 @@ Matchάρει την city Rethymno OR Chalkida.
 Sortάρει με βάση το balance από το μικρότερο στο μεγαλύτερο (1)
 Και κάνει limit 1 εγγραφή.
 Οπότε εμφανίζει 1 εγγραφη μόνο και ποια? αυτή με το μικρότερο balance
+
+
+
+[
+  {
+    "_id": 1,
+    "name": "Maria",
+    "age": 30,
+    "city": "Athens",
+    "status": "active",
+    "balance": 200
+  },
+  {
+    "_id": 2,
+    "name": "George",
+    "age": 22,
+    "city": "Rethymno",
+    "status": "inactive",
+    "balance": 222
+  },
+  {
+    "_id": 3,
+    "name": "Nikos",
+    "age": 33,
+    "city": "Chalkida",
+    "status": "active",
+    "balance": 500
+  },
+  {
+    "_id": 4,
+    "name": "Konstantina",
+    "age": 55,
+    "city": "Patra",
+    "status": "active",
+    "balance": 1111
+  },
+  {
+    "_id": 5,
+    "name": "Kostas",
+    "age": 44,
+    "city": "Athens",
+    "status": "active",
+    "balance": 2222
+  },
+  {
+    "_id": 6,
+    "name": "George",
+    "age": 33,
+    "city": "Athens",
+    "status": "inactive",
+    "balance": 2223
+  },
+  {
+    "_id": 7,
+    "name": "Andreas",
+    "age": 66,
+    "city": "Patra",
+    "status": "active",
+    "balance": 1111
+  },
+  {
+    "_id": 8,
+    "name": "Panagiotis",
+    "age": 32,
+    "city": "Patra",
+    "status": "inactive",
+    "balance": 345
+  }
+]
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "city": {
+        "$in": [
+          "Athens",
+          "Patra"
+        ]
+      }
+    }
+  },
+  {
+    "$sort": {
+      "age": 1
+    }
+  },
+  {
+    "$limit": 2
+  }
+])
+
+ΚΑΙ ΕΧΕΙ ΤΟ ΕΞΗΣ ΑΠΟΤΕΛΕΣΜΑ
+
+[
+  {
+    "_id": 1,
+    "age": 30,
+    "balance": 200,
+    "city": "Athens",
+    "name": "Maria",
+    "status": "active"
+  },
+  {
+    "_id": 8,
+    "age": 32,
+    "balance": 345,
+    "city": "Patra",
+    "name": "Panagiotis",
+    "status": "inactive"
+  }
+]
+
+ΕΑΝ ΑΛΛΑΞΩ ΣΕΙΡΑ ΣΤΟ sort και limit τι αποτέλεσμα αναμένεται να έχω?????
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "city": {
+        "$in": [
+          "Athens",
+          "Patra"
+        ]
+      }
+    }
+  },
+  {
+    "$limit": 2
+  },
+  {
+    "$sort": {
+      "age": 1
+    }
+  }
+])
+
+ΝΑ Η ΔΙΑΦΟΡΑ 
+
+[
+  {
+    "_id": 1,
+    "age": 30,
+    "balance": 200,
+    "city": "Athens",
+    "name": "Maria",
+    "status": "active"
+  },
+  {
+    "_id": 4,
+    "age": 55,
+    "balance": 1111,
+    "city": "Patra",
+    "name": "Konstantina",
+    "status": "active"
+  }
+]
+
+ΓΙΑΤΙ ΥΠΑΡΧΕΙ ΑΥΤΗ Η ΔΙΑΦΟΡΑ ????
+
+Και στις δυο περιπτώσεις matchάραμε όπου υπήρχε city Athens OR Patra. Δηλαδή έχουμε ID 1 , ID 4 , ID 5, ID 6 , ID 7 , ID 8
+Στην πρώτη περίπτωση πρώτα sortάραμε με ηλικία από μικρότερο προς μεγαλύτερο. Δηλαδή έχουμε μέχρι στιγμής, ID 1 < ID 8 <ID 6 < ID 5 < ID 4 < ID 7
+Και μετά κάνω Limit τις 2 πρώτες επαφές , δηλαδή εμφανίζω ID 1 και ID 8.
+
+Στην δεύτερη περίπτωση που κάνω ΠΡΩΤΑ limit, από τις ανωτέρω 6 εγγραφές κρατάω μόνο τις 2 πρώτες. Δηλαδή ID 1 και ID 4.
+Σε τρίτο βήμα κάνω sort με ηλικία οπότε συγκρίνω μόνο τις επαφές 1 και 4 και τις sortάρω ως εξής ID 1 < ID 4
+
+
+
