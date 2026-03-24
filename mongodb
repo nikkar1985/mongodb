@@ -39,3 +39,9 @@ https://www.mongoplayground.net/
 queries :
 
 db.collection.find({}) //ΧΩΡΙΣ ΦΙΛΤΡΟ
+
+
+db.collection.find({
+  "city": "Athens",
+  "status": "active"
+}) // Διπλό φίλτρο , σαν το λογικο ΚΑΙ AND &&
