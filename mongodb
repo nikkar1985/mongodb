@@ -87,3 +87,23 @@ db.collection.find({
     ]
   }
 }) // εναλλακτικός τρόπος για το OR  .ψάχνει  πόλη Αθήνα ή Πάτρα
+
+
+db.collection.aggregate([
+  {
+    "$sort": {
+      "age": 1
+    }
+  }
+]) //sort από το πιο μικρό στο πιο μεγάλο
+
+
+db.collection.aggregate([
+  {
+    "$sort": {
+      "age": -1
+    }
+  }
+])// sort απο το πιο μεγάλο στρο πιο μικρό
+
+
