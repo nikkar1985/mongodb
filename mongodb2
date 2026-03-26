@@ -985,3 +985,145 @@ db.collection.aggregate([
 του κάθε χρήστη.
 και σε τρίτο χρόνο ταξινομώ / sortάρω τον πίνακα από το μεγαλύτερο άρθροισμα στο μικρότερο -1
 
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "collection": "users"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "as": "orders"
+    }
+  },
+  {
+    "$unwind": "$orders"
+  }
+]) 
+
+είναι αυτό που δείξαμε πριν ότι κάνει το unwind.
+
+[
+  {
+    "_id": 2,
+    "balance": 222,
+    "city": "Rethymno",
+    "collection": "users",
+    "name": "George",
+    "orders": {
+      "_id": 101,
+      "amount": 2221,
+      "collection": "orders",
+      "product": "PC",
+      "user_id": 2
+    }
+  },
+  {
+    "_id": 2,
+    "balance": 222,
+    "city": "Rethymno",
+    "collection": "users",
+    "name": "George",
+    "orders": {
+      "_id": 102,
+      "amount": 1234,
+      "collection": "orders",
+      "product": "TV",
+      "user_id": 2
+    }
+  },
+  {
+    "_id": 3,
+    "balance": 500,
+    "city": "Chalkida",
+    "collection": "users",
+    "name": "Nikos",
+    "orders": {
+      "_id": 103,
+      "amount": 2223,
+      "collection": "orders",
+      "product": "TV",
+      "user_id": 3
+    }
+  },
+  {
+    "_id": 4,
+    "balance": 233,
+    "city": "Patra",
+    "collection": "users",
+    "name": "Konstantina",
+    "orders": {
+      "_id": 104,
+      "amount": 321,
+      "collection": "orders",
+      "product": "printer",
+      "user_id": 4
+    }
+  },
+  {
+    "_id": 5,
+    "balance": 2221,
+    "city": "Athens",
+    "collection": "users",
+    "name": "George",
+    "orders": {
+      "_id": 105,
+      "amount": 222,
+      "collection": "orders",
+      "product": "PLAYSTATION",
+      "user_id": 5
+    }
+  },
+  {
+    "_id": 5,
+    "balance": 2221,
+    "city": "Athens",
+    "collection": "users",
+    "name": "George",
+    "orders": {
+      "_id": 106,
+      "amount": 222,
+      "collection": "orders",
+      "product": "PLAYSTATION2",
+      "user_id": 5
+    }
+  }
+]
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "collection": "users"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "as": "orders"
+    }
+  },
+  {
+    "$unwind": "$orders"
+  },
+  {
+    "$group": {
+      "_id": "$city",
+      "city_revenew": {
+        "$sum": "$orders.amount"
+      }
+    }
+  },
+  {
+    "$sort": {
+      "total_city_revenue": 1
+    }
+  }
+])
