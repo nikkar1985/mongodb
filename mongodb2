@@ -573,3 +573,322 @@ db.collection.aggregate([
 
 
 
+
+[
+  {
+    "_id": 1,
+    "name": "Maria",
+    "city": "Athens",
+    "balance": 200,
+    "collection": "users"
+  },
+  {
+    "_id": 2,
+    "name": "George",
+    "city": "Rethymno",
+    "balance": 222,
+    "collection": "users"
+  },
+  {
+    "_id": 3,
+    "name": "Nikos",
+    "city": "Chalkida",
+    "balance": 500,
+    "collection": "users"
+  },
+  {
+    "_id": 4,
+    "name": "Konstantina",
+    "city": "Patra",
+    "balance": 233,
+    "collection": "users"
+  },
+  {
+    "_id": 5,
+    "name": "George",
+    "city": "Athens",
+    "balance": 2221,
+    "collection": "users"
+  },
+  {
+    "_id": 101,
+    "user_id": 1,
+    "product": "PC",
+    "amount": 2221,
+    "collection": "orders"
+  },
+  {
+    "_id": 102,
+    "user_id": 2,
+    "product": "TV",
+    "amount": 1234,
+    "collection": "orders"
+  },
+  {
+    "_id": 103,
+    "user_id": 3,
+    "product": "TV",
+    "amount": 2223,
+    "collection": "orders"
+  },
+  {
+    "_id": 104,
+    "user_id": 4,
+    "product": "printer",
+    "amount": 321,
+    "collection": "orders"
+  },
+  {
+    "_id": 105,
+    "user_id": 5,
+    "product": "PLAYSTATION",
+    "amount": 222,
+    "collection": "orders"
+  }
+]
+
+db.collection.find({
+  "collection": "users"
+}) εδώ βρίσκουμε τους users χρησιμοποιώντας το key collection.
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "collection": "users"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "as": "agores"
+    }
+  }
+])
+
+
+βημα 1 κράτα/matchαρε μόνο τους χρήστες
+βήμα 2 ψάξε/lookup στον πίνακα για παραγγελίες
+from collection / ουσιαστικά στον ίδιο πίνακα
+localfield το id εκάστοτε χρήστη
+foreignfield το userid στην εκάστοτε παραγγελία
+as agores ονομάζουμε τη νέα λίστα agores
+
+
+[
+  {
+    "_id": 1,
+    "agores": [
+      {
+        "_id": 101,
+        "amount": 2221,
+        "collection": "orders",
+        "product": "PC",
+        "user_id": 1
+      }
+    ],
+    "balance": 200,
+    "city": "Athens",
+    "collection": "users",
+    "name": "Maria"
+  },
+  {
+    "_id": 2,
+    "agores": [
+      {
+        "_id": 102,
+        "amount": 1234,
+        "collection": "orders",
+        "product": "TV",
+        "user_id": 2
+      }
+    ],
+    "balance": 222,
+    "city": "Rethymno",
+    "collection": "users",
+    "name": "George"
+  },
+  {
+    "_id": 3,
+    "agores": [
+      {
+        "_id": 103,
+        "amount": 2223,
+        "collection": "orders",
+        "product": "TV",
+        "user_id": 3
+      }
+    ],
+    "balance": 500,
+    "city": "Chalkida",
+    "collection": "users",
+    "name": "Nikos"
+  },
+  {
+    "_id": 4,
+    "agores": [
+      {
+        "_id": 104,
+        "amount": 321,
+        "collection": "orders",
+        "product": "printer",
+        "user_id": 4
+      }
+    ],
+    "balance": 233,
+    "city": "Patra",
+    "collection": "users",
+    "name": "Konstantina"
+  },
+  {
+    "_id": 5,
+    "agores": [
+      {
+        "_id": 105,
+        "amount": 222,
+        "collection": "orders",
+        "product": "PLAYSTATION",
+        "user_id": 5
+      }
+    ],
+    "balance": 2221,
+    "city": "Athens",
+    "collection": "users",
+    "name": "George"
+  }
+]
+
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "collection": "users"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "as": "agores"
+    }
+  },
+  {
+    "$project": {
+      "name": 1,
+      "city": 1,
+      "order_count": {
+        "$size": "$agores"
+      },
+      "_id": 0
+    }
+  }
+]) επεκτείνοντας την προηγούμενη άσκηση, εμφανίσαμε στο όνομα και πόλη κάθε χρήστη πόσες size αγορές έκανε από το νέο πίνακα agore
+που είχαμε φτιάξει πριν
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "collection": "users"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "as": "agores"
+    }
+  },
+  {
+    "$project": {
+      "name": 1,
+      "city": 1,
+      "order_count": {
+        "$size": "$agores"
+      },
+      "total_spent": {
+        "$sum": "$agores.amount"
+      },
+      "_id": 0
+    }
+  }
+])
+
+είναι επέκταση του προηγούμενου παραδείγματος και υπολογίζει συμπληρωματικά το ολικό άρθροισμα 
+χρησιμοποιώντας από τον πίνακα agores το κάθε amount.
+
+
+
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "collection": "users"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "as": "agores"
+    }
+  },
+  {
+    "$unwind": "$agores"
+  },
+  {
+    "$project": {
+      "customer": "$name",
+      "product_bought": "$agores.product",
+      "price": "$agores.amount"
+    }
+  }
+])
+
+το unwind ξεχωρίζει τη λίστα με τις εγγραφές.
+
+
+[
+  {
+    "_id": 1,
+    "customer": "Maria",
+    "price": 2221,
+    "product_bought": "PC"
+  },
+  {
+    "_id": 2,
+    "customer": "George",
+    "price": 1234,
+    "product_bought": "TV"
+  },
+  {
+    "_id": 3,
+    "customer": "Nikos",
+    "price": 2223,
+    "product_bought": "TV"
+  },
+  {
+    "_id": 4,
+    "customer": "Konstantina",
+    "price": 321,
+    "product_bought": "printer"
+  },
+  {
+    "_id": 5,
+    "customer": "George",
+    "price": 222,
+    "product_bought": "PLAYSTATION"
+  },
+  {
+    "_id": 5,
+    "customer": "George",
+    "price": 222,
+    "product_bought": "PLAYSTATION2"
+  }
+]
