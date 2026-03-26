@@ -419,3 +419,157 @@ db.collection.aggregate([
 ]
 
 
+db.collection.aggregate([
+  {
+    "$group": {
+      "_id": "$status",
+      "count": {
+        "$sum": 1
+      }
+    }
+  }
+])
+Σου δείχνει στατιστικά ανά κατηγορία/key που έχουμε επιλέξει, εδώ το status
+
+[
+  {
+    "_id": "active",
+    "count": 6
+  },
+  {
+    "_id": "inactive",
+    "count": 4
+  }
+]
+
+
+db.collection.aggregate([
+  {
+    "$group": {
+      "_id": "$city",
+      "count": {
+        "$sum": 1
+      }
+    }
+  }
+])
+Εδώ πόσες εγγραφές έχει η κάθε πόλη
+
+
+db.collection.aggregate([
+  {
+    "$group": {
+      "_id": "$city",
+      "avg_age": {
+        "$avg": "$age"
+      }
+    }
+  }
+]) το $avg υπολογίζει τον μέσο όρο ενός key. εδώ του age
+
+db.collection.aggregate([
+  {
+    "$group": {
+      "_id": "$city",
+      "avg_balance": {
+        "$avg": "$balance"
+      }
+    }
+  }
+]) μέσος όρος του balance. 
+
+
+db.collection.aggregate([
+  {
+    "$addFields": {
+      "double_balance": {
+        "$multiply": [
+          "$balance",
+          2
+        ]
+      }
+    }
+  }
+]) δημιουργία νεου key double_balance όπου πολλαπλασιάζει / multiply το balance επί 2
+
+
+
+db.collection.aggregate([
+  {
+    "$addFields": {
+      "double_age": {
+        "$multiply": [
+          "$age",
+          2
+        ]
+      },
+      "triple_balance": {
+        "$multiply": [
+          "$balance",
+          3
+        ]
+      }
+    }
+  }
+])
+
+δημιουργία 2 νέων keys. double age όπου διπλασιάζει κάθε age και  triple balance όπου τριπλασιάζει κάθε Balance
+
+
+db.collection.aggregate([
+  {
+    "$group": {
+      "_id": "$city",
+      "avg_balance": {
+        "$avg": "$balance"
+      }
+    }
+  },
+  {
+    "$match": {
+      "avg_balance": {
+        "$gt": 300
+      }
+    }
+  },
+  {
+    "$sort": {
+      "avg_balance": -1
+    }
+  }
+])
+
+
+σε πρωτο χρονο βρισκει τον μέσον όρο Balance.
+σε δευτερο κρατάει τα balances με μέσο όρο πάνω απο 300
+και σε τριτο και τελικό χρόνο sortαρε από το μεγαλύτερο στο μικρότερο -1
+
+
+db.collection.aggregate([
+  {
+    "$group": {
+      "_id": "$city",
+      "avg_age": {
+        "$avg": "$age"
+      }
+    }
+  },
+  {
+    "$match": {
+      "avg_age": {
+        "$gt": 25
+      }
+    }
+  },
+  {
+    "$sort": {
+      "avg_age": 1
+    }
+  }
+])
+σε πρώτο χρόνο βρίσκω το μέσον όρο της ηλικίας.
+σε δεύτερο ματσαρω με την ηλικία μεγαλύτερη από 25
+και σε τρίτο τα τοποθετώ κατά αύξουσα ηλικία 1.
+
+
+
