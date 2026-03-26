@@ -161,3 +161,261 @@ sort από μεγαλύτερο σε μικρότερο στο balance (-1)
 name (1) , city (1), balance (1) και κανένα άλλο key.
 Προσοχή το id για να μην φάνει πρέπει να είναι 0
 γιατί εμφανίζεται εξ ορισμού.
+
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "city": "Athens",
+      "age": {
+        "$gte": 20,
+        "$lte": 30
+      }
+    }
+  },
+  {
+    "$sort": {
+      "age": 1
+    }
+  },
+  {
+    "$project": {
+      "name": 1,
+      "city": 1,
+      "balance": 1,
+      "age": 1,
+      "_id": 0
+    }
+  }
+])
+
+Ματσάρει πρώτα πόλη && 20<=ηλικία<=30.
+σορτάρει κατα αύξουσα ηλικία (1)
+και εμφανίζει name, city, balance, age
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "status": "active"
+    }
+  },
+  {
+    "$group": {
+      "_id": "$city",
+      "count": {
+        "$sum": 1
+      }
+    }
+  }
+])
+
+Εμφανίζει το άρθροισμα count των εγγραφών που ειναι active σε κάθε πόλη.
+
+[
+  {
+    "_id": "Athens",
+    "count": 4
+  },
+  {
+    "_id": "Chalkida",
+    "count": 1
+  },
+  {
+    "_id": "Patra",
+    "count": 1
+  }
+]
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "status": "active"
+    }
+  },
+  {
+    "$group": {
+      "_id": "$city",
+      "total_cash": {
+        "$sum": "$balance"
+      }
+    }
+  }
+])
+
+εδώ κάνε sum το balance της κάθε πόλης. Πχ η αθήνα που έχει 4 εγγραφές θα τα προσθέσει και τα
+4 balance....
+
+[
+  {
+    "_id": "Chalkida",
+    "total_cash": 500
+  },
+  {
+    "_id": "Patra",
+    "total_cash": 321
+  },
+  {
+    "_id": "Athens",
+    "total_cash": 5878
+  }
+]
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "status": "active"
+    }
+  },
+  {
+    "$group": {
+      "_id": "$city",
+      "count": {
+        "$sum": 1
+      },
+      "total_cash": {
+        "$sum": "$balance"
+      }
+    }
+  }
+]) 
+Συνδυασμός και των 2 πιο πάνω περιπτώσεων 
+
+[
+  {
+    "_id": "Chalkida",
+    "count": 1,
+    "total_cash": 500
+  },
+  {
+    "_id": "Patra",
+    "count": 1,
+    "total_cash": 321
+  },
+  {
+    "_id": "Athens",
+    "count": 4,
+    "total_cash": 5878
+  }
+]
+
+
+db.collection.aggregate([
+  {
+    "$addFields": {
+      "risk_level": "check"
+    }
+  }
+])
+ΔΗΜΙΟΥΡΓΙΑ ΜΟΝΟ ΕΝΟΣ ΝΕΟ ΠΕΔΙΟΥ
+
+
+db.collection.aggregate([
+  {
+    "$addFields": {
+      "risk_level": {
+        "$cond": {
+          "if": {
+            "$lt": [
+              "$balance",
+              500
+            ]
+          },
+          "then": "HIGH",
+          "else": "LOW"
+        }
+      }
+    }
+  }
+])
+
+ΔΗΜΙΟΥΡΓΟΥΜΕ ΕΝΑ ΝΕΟ ΠΕΔIO ΤΟ RISK LEVEL ΚΑΙ ΕΑΝ ΕΙΝΑΙ ΠΑΝΩ ΑΠΟ 500 ΤΟ BALANCE ΤΟΤΕ ΤΟ ΟΝΟΜΑΖΩ HIGH 
+ΑΛΛΙΩΣ ΤΟ ΟΝΟΜΑΖΩ LOW
+
+
+db.collection.aggregate([
+  {
+    "$addFields": {
+      "risk_level": {
+        "$cond": {
+          "if": {
+            "$lt": [
+              "$balance",
+              500
+            ]
+          },
+          "then": "HIGH",
+          "else": "LOW"
+        }
+      }
+    }
+  },
+  {
+    "$project": {
+      "name": 1,
+      "balance": 1,
+      "risk_level": 1,
+      "_id": 0
+    }
+  }
+])
+
+Στο προηγούμενο παράδειγμα, κρατάω μόνο το name, balance και τη νέο Key που έχω δημιουργήσει το risk_level
+
+[
+  {
+    "balance": 200,
+    "name": "Maria",
+    "risk_level": "HIGH"
+  },
+  {
+    "balance": 222,
+    "name": "George",
+    "risk_level": "HIGH"
+  },
+  {
+    "balance": 500,
+    "name": "Nikos",
+    "risk_level": "LOW"
+  },
+  {
+    "balance": 233,
+    "name": "Konstantina",
+    "risk_level": "HIGH"
+  },
+  {
+    "balance": 2221,
+    "name": "George",
+    "risk_level": "LOW"
+  },
+  {
+    "balance": 2221,
+    "name": "Andreas",
+    "risk_level": "LOW"
+  },
+  {
+    "balance": 1234,
+    "name": "Panagiotis",
+    "risk_level": "LOW"
+  },
+  {
+    "balance": 2223,
+    "name": "Eleni",
+    "risk_level": "LOW"
+  },
+  {
+    "balance": 321,
+    "name": "Dimitris",
+    "risk_level": "HIGH"
+  },
+  {
+    "balance": 222,
+    "name": "Dimitris",
+    "risk_level": "HIGH"
+  }
+]
+
+
