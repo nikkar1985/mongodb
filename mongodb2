@@ -1,1 +1,163 @@
 
+[
+  {
+    "_id": 1,
+    "name": "Maria",
+    "age": 30,
+    "city": "Athens",
+    "status": "active",
+    "balance": 200
+  },
+  {
+    "_id": 2,
+    "name": "George",
+    "age": 22,
+    "city": "Rethymno",
+    "status": "inactive",
+    "balance": 222
+  },
+  {
+    "_id": 3,
+    "name": "Nikos",
+    "age": 33,
+    "city": "Chalkida",
+    "status": "active",
+    "balance": 500
+  },
+  {
+    "_id": 4,
+    "name": "Konstantina",
+    "age": 55,
+    "city": "Patra",
+    "status": "inactive",
+    "balance": 233
+  },
+  {
+    "_id": 5,
+    "name": "George",
+    "age": 44,
+    "city": "Athens",
+    "status": "active",
+    "balance": 2221
+  },
+  {
+    "_id": 6,
+    "name": "Andreas",
+    "age": 21,
+    "city": "Patra",
+    "status": "inactive",
+    "balance": 2221
+  },
+  {
+    "_id": 7,
+    "name": "Panagiotis",
+    "age": 42,
+    "city": "Athens",
+    "status": "active",
+    "balance": 1234
+  },
+  {
+    "_id": 8,
+    "name": "Eleni",
+    "age": 52,
+    "city": "Athens",
+    "status": "active",
+    "balance": 2221
+  },
+  {
+    "_id": 9,
+    "name": "Dimitris",
+    "age": 22,
+    "city": "Patra",
+    "status": "active",
+    "balance": 321
+  },
+  {
+    "_id": 10,
+    "name": "Dimitris",
+    "age": 42,
+    "city": "Athens",
+    "status": "inactive",
+    "balance": 222
+  }
+
+
+
+db.collection.find({
+  "age": {
+    "$gte": 30
+  }
+}) // Σε συνέχεια του gt greater than εδω έχουμε greater than equal >= 30
+]
+
+
+db.collection.find({
+  "age": {
+    "$lte": 30
+  }
+}) // Σε συνέχεια του lt less than εδώ έχουμε το less than equal <=30
+
+
+db.collection.find({
+  "age": {
+    "$gte": 30,
+    "$lte": 50
+  }
+}) Διπλό φίλτρο σαν το λογικό AND && ΑΛΛΆ ΣΤΟ ΙΔΙΟ KEY
+
+
+db.collection.find({
+  "age": {
+    "$gte": 30,
+    "$lte": 50
+  },
+  "status": "active"
+}) Τριπλό φίλτρο, πρώτα φιλτράρει τις ηλικίες και μετά σε αυτές τις φιλτραρισμένες ηλικίες βρίσκει το status active.
+
+
+
+db.collection.find({
+  "balance": {
+    "$gte": 300,
+    "$lte": 1000
+  },
+  "age": {
+    "$gte": 20,
+    "$lte": 30
+  }
+})
+
+Οπότε εδώ φιλτράρει και balance - όρια - και ηλικίες - όρια .
+
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "status": "active",
+      "balance": {
+        "$gte": 500
+      }
+    }
+  },
+  {
+    "$sort": {
+      "balance": -1
+    }
+  },
+  {
+    "$project": {
+      "name": 1,
+      "city": 1,
+      "balance": 1,
+      "_id": 0
+    }
+  }
+])
+
+πρωτον βρισκουμε status active && balance >=500
+sort από μεγαλύτερο σε μικρότερο στο balance (-1)
+εμφάνιση στισ επαφές μασ μονο του
+name (1) , city (1), balance (1) και κανένα άλλο key.
+Προσοχή το id για να μην φάνει πρέπει να είναι 0
+γιατί εμφανίζεται εξ ορισμού.
