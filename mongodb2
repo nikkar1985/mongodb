@@ -892,3 +892,96 @@ db.collection.aggregate([
     "product_bought": "PLAYSTATION2"
   }
 ]
+
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "collection": "users"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "as": "orders"
+    }
+  },
+  {
+    "$match": {
+      "orders.0": {
+        "$exists": true
+      }
+    }
+  }
+])
+
+εδω σε πρώτο χρόνο βρίσκω του users με την εντολή match.
+σε δεύτερο χρόνο ψάχνω στα orders. 
+και σε τρίτο χρόνο εάν ο πίνακας / array δεν ειναι κενός δηλαδή orders.0 είναι true τότε εμφανίζει .
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "collection": "users"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "as": "orders"
+    }
+  },
+  {
+    "$match": {
+      "orders.amount": {
+        "$gt": 1000
+      }
+    }
+  }
+])
+εδω σε πρώτο χρόνο βρίσκω του users με την εντολή match.
+σε δεύτερο χρόνο ψάχνω στα orders. 
+και σε τρίτο χρόνο εάν ο πίνακας / array έχει order.amount greater than 1000 το εμφανίζει
+
+
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "collection": "users"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "user_id",
+      "as": "orders"
+    }
+  },
+  {
+    "$addFields": {
+      "total": {
+        "$sum": "$orders.amount"
+      }
+    }
+  },
+  {
+    "$sort": {
+      "total": -1
+    }
+  }
+])
+
+εδω σε πρώτο χρόνο βρίσκω του users με την εντολή match.
+σε δεύτερο χρόνο δημιουργώ ένα νέο πεδίο που λέμε total και είναι το άρθροισμα sum των παραγγελιών
+του κάθε χρήστη.
+και σε τρίτο χρόνο ταξινομώ / sortάρω τον πίνακα από το μεγαλύτερο άρθροισμα στο μικρότερο -1
+
