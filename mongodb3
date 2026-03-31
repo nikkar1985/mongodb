@@ -804,3 +804,208 @@ db.collection.aggregate([
     }
   }
 ])
+
+
+ΕΥΡΕΣΗ ΛΙΣΤΑΣ ΜΕ uSERNAME ΠΟΥ ΕΧΟΥΝ PREMIUM ΠΛΑΝΟ
+
+ΒΗΜΑ 1 
+ΕΥΡΕΣΗ ΠΟΥ ΕΙΝΑΙ ΤΟ PREMIUM ΠΛΑΝΟ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub"
+    }
+  }
+])
+
+ΒΗΜΑ 2 
+ΧΡΕΙΑΖΟΜΑΙ ΚΑΙ ΤΟ ΠΛΑΝΟ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub",
+      "plan": "Premium"
+    }
+  }
+])
+
+
+ΒΗΜΑ 3
+
+ΔΗΜΙΟΥΡΓΙΑ ΠΙΝΑΚΑ USER
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub",
+      "plan": "Premium"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "profile_id",
+      "foreignField": "_id",
+      "as": "user"
+    }
+  }
+])
+
+
+BHMA 4 "ΣΠΑΣΙΜΟ" ΤΗΣ ΣΤΙΒΑΣ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub",
+      "plan": "Premium"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "profile_id",
+      "foreignField": "_id",
+      "as": "user"
+    }
+  },
+  {
+    "$unwind": "$user"
+  }
+])
+
+BHMA 5 ΕΜΦΑΝΙΣΗ USERNAME
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub",
+      "plan": "Premium"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "profile_id",
+      "foreignField": "_id",
+      "as": "user"
+    }
+  },
+  {
+    "$unwind": "$user"
+  },
+  {
+    "$project": {
+      "user.username": 1,
+      "_id": 0
+    }
+  }
+])
+
+
+ΕΥΡΕΣΗ ΧΡΗΣΤΩΝ ΠΟΥ ΕΧΟΥΝ TAG GAMING
+
+BHMA 1 ΕΥΡΕΣΗ ΧΡΗΣΤΩΝ
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2
+ΟΙ ΧΡΗΣΤΕΣ ΠΟΥ ΕΧΟΥΝ ΤΑG GAMING
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile",
+      "tags": "gaming"
+    }
+  }
+])
+
+ΠΟΙΟΙ ΕΙΝΑΙ 2 ΠΡΩΤΟΙ ΧΡΗΣΤΕΣ ΑΠΟ ΤΗΝ ΕΛΛΑΔΑ
+
+ΒΗΜΑ 1 ΥΠΟΛΟΓΙΣΜΟΣ ΧΡΗΣΤΩΝ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 ΟΙ ΧΡΗΣΤΕΣ ΝΑ ΕΙΝΑΙ ΑΠΟ ΕΛΛΑΔΑ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile",
+      "country": "Greece"
+    }
+  }
+])
+
+
+ΒΗΜΑ 3 
+ΚΡΑΤΑΜΕ ΑΠΟ ΤΟΥΣ 3 ΤΟΥΣ 2 ΠΡΩΤΟΥΣ
+ΧΡΗΣΙΜΟΠΟΙΟΥΜΕ ΤΟ LIMIT
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile",
+      "country": "Greece"
+    }
+  },
+  {
+    "$limit": 2
+  }
+])
+
+
+
+ΕΥΡΕΣΗ 2 ΠΡΩΤΩΝ BASIC ΣΥΝΔΡΟΜΩΝ ΠΟΥ ΕΙΝΑΙ ACTIVE
+
+ΒΗΜΑ 1
+ΠΡΕΠΕΙ ΝΑ ΣΚΕΦΤΟΥΜΕ ΤΙ ΘΑ MATCHAΡΟΥΜΕ
+
+1. TYPE = SUB
+2. PLAN = BASIC
+3. STATUS = ACTIVE
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub",
+      "plan": "Basic",
+      "status": "active"
+    }
+  }
+  
+])
+
+
+ΒΗΜΑ ΜΕ ΤΟ LIMIT ΚΡΑΤΑΜΕ ΟΣΕς ΕΠΑΦΕΣ ΘΕΛΟΥΜΕ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub",
+      "plan": "Basic",
+      "status": "active"
+    }
+  },
+  {
+    "$limit": 2
+  }
+])
+
+ΠΑΙΖΕΙ ΡΟΛΟ Η ΣΕΙΡΑ, ΔΗΛΑΔΗ ΠΡΩΤΑ LIMIT κΑΙ ΜΕΤΑ mATCH???
+
+ΝΑΙ ΓΙΑΤΙ ΔΕΝ ΓΙΝΕΤΑΙ ΝΑ ΓΙΝΕΙ LIMIT ΣΕ ΚΑΠΟΙΑ ΛΙΣΤΑ
