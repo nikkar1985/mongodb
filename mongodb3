@@ -452,3 +452,171 @@ db.collection.aggregate([
   }
 ])
 
+ΠΑΜΕ ΝΑ ΒΡΟΥΜΕ ΤΟ ΣΥΝΟΛΙΚΟ ΠΟΣΟ ΠΟΥ ΠΛΗΡΩΝΕΙ Ο ΚΑΘΕ ΧΡΗΣΤΗΣ ΓΙΑ ΤΟ ΣΥΝΟΛΟ ΤΩΝ ΣΥΝΔΡΟΜΩΝ ΤΟΥ
+
+ΒΗΜΑ 1 ΠΡΕΠΕΙ ΝΑ ΒΡΟΥΜΕ ΤΟΥΣ ΧΡΗΣΤΕΣ
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 ΝΑ ΦΤΙΑΞΟΥΜΕ ΕΝΑΝ ΠΙΝΑΚΑ ΟΠΟΥ ΘΑ ΕΧΕΙ ΤΙΣ ΣΥΝΔΡΟΜΕΣ
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "profile_id",
+      "as": "subs"
+    }
+  },
+{
+}
+])
+
+
+
+ΒΗΜΑ 3 ΜΕΣΑ ΑΠΟ ΤΟΝ ΠΙΝΑΚΑ ΘΑ ΚΑΝΟΥΜΕ ΠΡΟΣΘΕΣΗ ΤΩΝ ΠΟΣΩΝ
+ΠΡΟΣΟΧΗ ΣΤΗΝ ΠΡΟΣΘΕΣΗ  "$sum": "$subs.price"
+ΠΑΝΤΑ ΝΑ ΘΥΜΑΣΤΕ ΠΩΣ ΧΡΗΣΙΜΟΠΟΙΟΥΜΕ ΤΟΥΣ ΠΙΝΑΚΕΣ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "profile_id",
+      "as": "subs"
+    }
+  },
+  {
+    "$addFields": {
+      "total_spent": {
+        "$sum": "$subs.price"
+      }
+    }
+  }
+])
+
+
+ΕΜΦΑΝΙΣΗ ΜΟΝΟ USERNAME ΚΑΙ ΧΩΡΑΣ ΧΩΡΙΣ ID
+
+
+BHMA 1
+Αφου Username και Country έχει το type profile είναι αυτό που θα κρατήσουμε
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 ΕΜΦΑΝΙΣΗ ΑΠΟ ΟΛΑ ΜΟΝΟ ΤΟΥ USERNAME ΚΑΙ ΧΩΡΑΣ
+
+$PROJECT = SELECT ΤΗΣ SQL
+ΠΡΟΣΟΧΗ ΤΟ ID ΕΑΝ ΔΕΝ ΜΠΕΙ 0 ΘΑ ΕΜΦΑΝΙΣΤΕΙ
+ΓΙΑ ΝΑ ΕΜΦΑΝΙΣΤΟΥΝ ΟΙ ΕΓΓΡΑΦΕΣ ΠΡΕΠΕΙ ΝΑ ΜΠΕΙ 1
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$project": {
+      "username": 1,
+      "country": 1,
+      "_id": 0
+    }
+  }
+])
+
+ΕΛΕΓΧΟΣ ΕΑΝ Ο ΧΡΗΣΤΗΣ ΕΙΝΑΙ ΠΑΝΩ ΑΠΟ 18
+
+BHMA 1 ΠΡΕΠΕΙ ΝΑ ΔΟΥΜΕ ΠΟΥ ΥΠΑΡΧΕΙ Η ΗΛΙΚΙΑ ΚΑΙ ΝΑ ΚΡΑΤΗΣΟΥΜΕ ΤΙΣ ΣΥΓΚΕΚΡΙΜΕΝΕΣ ΕΓΓΡΑΦΕΣ
+ΥΠΑΡΧΕΙ ΣΤΟ ΠΡΟΦΙΛ ΟΠΟΤΕ
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 
+Ο ΕΛΕΓΧΟΣ ΘΑ ΓΙΝΕΙ ΜΕ ΤΟ $gt : 18 αλλά θα φτιαξουμε ενα νεο πεδίο $isAdult όπου εαν ισχυει η συνθήκη θα γραφει οτι ειναι adult
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$addFields": {
+      "isAdult": {
+        "$gte": [
+          "$age",
+          18
+        ]
+      }
+    }
+  }
+])
+
+"isAdult": true , "isAdult": false,
+
+ΠΟΣΟΙ ΧΡΗΣΤΕΣ ΥΠΑΡΧΟΥΝ ΑΝΑ ΧΩΡΑ
+
+ΒΗΜΑ 1 ΣΕ ΠΟΙΑ ΚΑΤΗΓΟΡΙΑ ΑΝΗΚΟΥΝ ΟΙ ΧΡΗΣΤΕΣ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 
+ΑΝΑ ΧΩΡΑ ΣΗΜΑΙΝΕΙ GROUP 
+ΠΟΣΟΙ ΧΡΗΣΤΕΣ ΣΗΜΑΙΝΕΙ ΑΡΘΡΟΙΣΜΑ
+το group παιρνει απο εγγραφες και τισ χωρίζει σε μικροτέρες εγγραφές βάσει κριτηρίων
+"userCount": {
+        "$sum": 1
+      } σημαίνει πρόσθεσε κατα 1
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$group": {
+      "_id": "$country",
+      "userCount": {
+        "$sum": 1
+      }
+    }
+  }
+])
+
