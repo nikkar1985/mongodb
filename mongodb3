@@ -1,0 +1,210 @@
+[
+  //users (type = profile)
+  {
+    "_id": 1,
+    "username": "Elena",
+    "age": 25,
+    "country": "Greece",
+    "type": "profile",
+    "tags": [
+      "sci-fi",
+      "rock"
+    ]
+  },
+  {
+    "_id": 2,
+    "username": "Alex",
+    "age": 34,
+    "country": "Italy",
+    "type": "profile",
+    "tags": [
+      "drama",
+      "pop"
+    ]
+  },
+  {
+    "_id": 3,
+    "username": "Marios",
+    "age": 19,
+    "country": "Greece",
+    "type": "profile",
+    "tags": [
+      "gaming",
+      "techno"
+    ]
+  },
+  {
+    "_id": 4,
+    "username": "Anna",
+    "age": 42,
+    "country": "Spain",
+    "type": "profile",
+    "tags": [
+      "cooking",
+      "jazz"
+    ]
+  },
+  {
+    "_id": 5,
+    "username": "Chris",
+    "age": 28,
+    "country": "Greece",
+    "type": "profile",
+    "tags": [
+      "sci-fi",
+      "gaming"
+    ]
+  },
+  {
+    "_id": 6,
+    "username": "Sofia",
+    "age": 31,
+    "country": "Italy",
+    "type": "profile",
+    "tags": [
+      "drama",
+      "jazz"
+    ]
+  },
+  //subscriptions (type = sub)
+  {
+    "_id": 101,
+    "plan": "Premium",
+    "price": 15,
+    "profile_id": 1,
+    "status": "active",
+    "type": "sub"
+  },
+  {
+    "_id": 102,
+    "plan": "Basic",
+    "price": 8,
+    "profile_id": 2,
+    "status": "active",
+    "type": "sub"
+  },
+  {
+    "_id": 103,
+    "plan": "Premium",
+    "price": 15,
+    "profile_id": 3,
+    "status": "expired",
+    "type": "sub"
+  },
+  {
+    "_id": 104,
+    "plan": "Family",
+    "price": 20,
+    "profile_id": 4,
+    "status": "active",
+    "type": "sub"
+  },
+  {
+    "_id": 105,
+    "plan": "Basic",
+    "price": 8,
+    "profile_id": 5,
+    "status": "active",
+    "type": "sub"
+  },
+  {
+    "_id": 106,
+    "plan": "Premium",
+    "price": 15,
+    "profile_id": 6,
+    "status": "active",
+    "type": "sub"
+  } , 
+  {
+    "_id": 107,
+    "plan": "Premium",
+    "price": 15,
+    "profile_id": 1,
+    "status": "active",
+    "type": "sub"
+  }
+]
+
+
+ΠΩΣ ΒΡΙΣΚΩ ΟΛΑ ΤΑ ΠΡΟΦΙΛ ΠΟΥ ΕΙΝΑΙ ΑΠΟ ΕΛΛΑΔΑ
+
+BHMA 1  ΜΟΥ ΚΡΑΤΆΕΙ ΤΙΣ ΕΓΓΡΑΦΕς ΠΟΥ ΕΧΟΥΝ TYPE=PROFILE
+
+db.collection.aggregate([
+  {
+    "$match": {
+      type: "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 ΜΟΥ ΚΡΑΤΑΕΙ ΤΙΣ ΕΓΓΡΑΦΕΣ ΤΟΥ ΒΗΜΑΤΟΣ 1 ΠΟΥ ΕΙΝΑΙ ΑΠΟ ΕΛΛΑΔΑ
+db.collection.aggregate([
+  {
+    "$match": {
+      type: "profile",
+      "country": "Greece"
+    }
+  }
+])
+
+ΠΩΣ ΒΡΙΣΚΩ ΤΙΣ ΕΓΓΡΑΦΕΣ ΤΟΥ ΒΗΜΑΤΟΣ 2 ΔΗΛΑΔΗ ΠΟΥ ΕΙΝΑΙ ΑΠΟ ΕΛΛΑΔΑ ΚΑΙ ΤΙ ΣΥΝΔΡΟΜΗ ΕΧΕΙ Η ΚΑΘΕΜΙΑ
+ΘΑ ΚΑΝΩ LEFT OUTER JOIN
+το lookup είναι ουσιαστικά η γέφυρα στην mongodb που ενώνει τα δεδομένα.
+το as:"my_subs" δημιουργεί έναν πίνακα my_subs μεσα στο προφίλ του χρήστη όπου θα μπουν όλες οι εγγραφές
+
+db.collection.aggregate([
+  {
+    "$match": {
+      type: "profile",
+      "country": "Greece"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "profile_id",
+      "as": "my_subs"
+    }
+  }
+])
+
+ΠΩΣ ΘΑ ΒΡΩ ΤΑ ΠΡΟΦΙΛ ΜΕ ACTIVE ΣΥΝΔΡΟΜΗ
+
+ΒΗΜΑ 1
+
+db.collection.aggregate([
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "profile_id",
+      "as": "my_subs"
+    }
+  }
+])
+
+
+
+
+ΒΗΜΑ 2 ΘΕΛΟΥΜΕ ΝΑ ΒΡΟΥΜΕ ΜΟΝΟ ΟΣΑ ΕΧΟΥΝ ΣΥΝΔΡΟΜΗ ACTIVE
+ΠΡΟΣΟΧΗ my_subs.status : "active"
+σημαίνει στον πίνακα my_subs του πρώτου βήματος κοίτα μόνο το status και συγκεκριμένα αυτό που είναι active
+και εμφανισέ μου μόνο αυτά τα απότελέσματα
+
+db.collection.aggregate([
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "profile_id",
+      "as": "my_subs"
+    }
+  },
+  {
+    "$match": {
+      "my_subs.status": "active"
+    }
+  }
+])
