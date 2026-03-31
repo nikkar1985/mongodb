@@ -620,3 +620,187 @@ db.collection.aggregate([
   }
 ])
 
+
+ΥΠΟΛΟΓΙΣΜΟΣ ΜΕΣΟΥ ΟΡΟΥ ΗΛΙΚΙΑΣ ΧΡΗΣΤΩΝ ΑΝΑ ΧΩΡΑ
+
+BHMA 1 ΘΑ ΚΡΑΤΗΣΟΥΜΕ ΜΟΝΟ ΤΙΣ ΕΓΓΡΑΦΕΣ ΤΩΝ ΧΡΗΣΤΩΝ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+BHMA 2
+ΑΝΑ ΧΩΡΑ ΣΗΜΑΙΝΕΙ GROUP 
+MΟ ΟΡΟΣ ΗΛΙΚΙΑΣ ΣΗΜΑΙΝΕΙ AVG 
+ΚΑΝΟΥΜΕ ΟΤΙ ΚΑΙ ΠΡΙΝ ΑΠΛΩΣ ΑΝΤΙ ΓΙΑ SUM EXOYME AVG
+το group παιρνει απο εγγραφες και τισ χωρίζει σε μικροτέρες εγγραφές βάσει κριτηρίων
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$group": {
+      "_id": "$country",
+      "avgAge": {
+        "$avg": "$age"
+      }
+    }
+  }
+])
+
+ΥΠΟΛΟΓΙΣΜΟΣ ΣΥΝΟΛΙΚΩΝ ΕΣΟΔΩΝ ΑΝΑ ΤΥΠΟΥ ΠΛΑΝΟΥ
+
+ΒΗΜΑ 1 
+ΑΝΑΓΝΩΡΙΖΟΥΜΕ ΣΕ ΠΟΙΑ ΚΑΤΗΓΟΡΙΑ ΑΝΗΚΟΥΝ ΤΑ ΕΣΟΔΑ ΚΑΙ ΤΟ ΠΛΑΝΟ
+
+ΑΝΗΚΟΥΝ ΣΤΟ TYPE SUB ΟΠΟΤΕ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub"
+    }
+  }
+])
+
+
+ΒΗΜΑ 2 
+ΠΑΛΙ GROUP ΌΠΟΥ ΜΕ ΕΝΔΙΑΦΕΡΕΙ ΑΥΤΗ ΤΗ ΦΟΡΑ ΤΟ PLAN ΚΑΙ ΟΜΑΔΟΠΟΙΩ ΚΑΤΑ PLAN
+ΚΑΙ ΕΝ ΣΥΝΕΧΕΙΑ ΚΑΝΩ ΠΡΟΣΘΕΣΗ SUM
+
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub"
+    }
+  },
+  {
+    "$group": {
+      "_id": "$plan",
+      "totalRevenue": {
+        "$sum": "$price"
+      }
+    }
+  }
+])
+
+ΤΑΞΙΝΟΜΗΣΗ ΧΡΗΣΤΩΝ ΑΠΟ ΜΕΓΑΛΥΤΕΡΟ ΣΕ ΜΙΚΡΟΤΕΡΟ
+
+ΒΗΜΑ 1
+ΝΑ ΒΡΟΥΜΕ ΠΟΥ ΣΕ ΠΟΙΑ ΚΑΤΗΓΟΡΙΑ ΑΝΗΚΟΥΝ ΟΙ ΧΡΗΣΤΕΣ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 
+ΤΑΞΙΝΟΜΗΣΗ = SORT
+ΑΠΟ ΜΕΓΑΛΥΤΕΡΟ ΣΕ ΜΙΚΡΟΤΕΡΟ ΣΗΜΑΙΝΕΙ - 1
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$sort": {
+      "age": -1
+    }
+  }
+])
+
+ΑΥΤΟ ΣΗΜΑΙΝΕΙ ΑΠΟ ΜΙΚΡΟΤΕΡΟ ΣΕ ΜΕΓΑΛΥΤΕΡΟ
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$sort": {
+      "age": 1
+    }
+  }
+])
+
+ΑΠΟΔΟΜΗΣΗ TAGS ΩΣΤΕ ΝΑ ΔΟΥΜΕ ΤΑ ΕΝΔΙΑΦΕΡΟΝΤΑ ΤΩΝ ΧΡΗΣΤΩΝ ΣΤΗ ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ ΜΑΣ
+
+ΒΗΜΑ 1 ΣΕ ΠΟΙΑ ΚΑΤΗΓΟΡΙΑ ΑΝΗΚΟΥΝ ΟΙ ΧΡΗΣΤΕΣ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 ΧΡΗΣΗ uNWIND
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$unwind": "$tags"
+  }
+  
+])
+
+ΒΗΜΑ 3
+
+ΕΜΦΑΝΙΣΗ uSERNAME TAGS ΧΩΡΙΣ id
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$unwind": "$tags"
+  },
+  {
+    "$project": {
+      "username": 1,
+      "tags": 1,
+      "_id": 0
+    }
+  }
+])
+
+
+ΠΟΣΕΣ ΦΟΡΕΣ ΕΜΦΑΝΙΖΕΤΑΙ ΤΟ ΚΑΘΕ TAG ΣΤΗΝ ΒΑΣΗ ΜΑΣ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$unwind": "$tags"
+  },
+  {
+    "$group": {
+      "_id": "$tags",
+      "count": {
+        "$sum": 1
+      }
+    }
+  }
+])
