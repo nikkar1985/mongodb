@@ -172,6 +172,7 @@ db.collection.aggregate([
 
 ΠΩΣ ΘΑ ΒΡΩ ΤΑ ΠΡΟΦΙΛ ΜΕ ACTIVE ΣΥΝΔΡΟΜΗ
 
+
 ΒΗΜΑ 1
 
 db.collection.aggregate([
@@ -208,3 +209,246 @@ db.collection.aggregate([
     }
   }
 ])
+
+ΠΑΙΖΕΙ ΡΟΛΟ Η ΣΕΙΡΑ ΤΩΝ ΕΝΤΟΛΩΝ ???
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "status": "active"
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "profile_id",
+      "as": "my_subs"
+    }
+  }
+])
+
+[
+  {
+    "_id": 101,
+    "my_subs": [],
+    "plan": "Premium",
+    "price": 15,
+    "profile_id": 1,
+    "status": "active",
+    "type": "sub"
+  },
+  {
+    "_id": 102,
+    "my_subs": [],
+    "plan": "Basic",
+    "price": 8,
+    "profile_id": 2,
+    "status": "active",
+    "type": "sub"
+  },
+  {
+    "_id": 104,
+    "my_subs": [],
+    "plan": "Family",
+    "price": 20,
+    "profile_id": 4,
+    "status": "active",
+    "type": "sub"
+  },
+  {
+    "_id": 105,
+    "my_subs": [],
+    "plan": "Basic",
+    "price": 8,
+    "profile_id": 5,
+    "status": "active",
+    "type": "sub"
+  },
+  {
+    "_id": 106,
+    "my_subs": [],
+    "plan": "Premium",
+    "price": 15,
+    "profile_id": 6,
+    "status": "active",
+    "type": "sub"
+  },
+  {
+    "_id": 107,
+    "my_subs": [],
+    "plan": "Premium",
+    "price": 15,
+    "profile_id": 1,
+    "status": "active",
+    "type": "sub"
+  }
+]
+
+ΟΠΟΤΕ ΝΑΙ ΠΑΙΖΕΙ ΡΟΛΟ . ΕΑΝ ΟΜΩΣ ΓΡΑΨΟΥΜΕ ΣΩΣΤΑ ΤΟΝ ΠΙΝΑΚΑ ΟΠΩς ΘΑ ΔΟΥΜΕ ΑΡΓΟΤΕΡΑ ΔΕΝ ΠΑΙΖΕΙ ΡΟΛΟ
+
+
+ΠΑΜΕ ΝΑ ΒΡΟΥΜΕ ΤΑ PROFILE ΑΝΩ ΤΩΝ 30 ΕΤΩΝ ΚΑΙ ΤΑΥΤΟΧΡΟΝΑ ΝΑ ΕΧΟΥΝ PREMIUM ΠΛΑΝΟ
+
+ΒΗΜΑ 1 ΘΑ ΒΡΟΥΜΕ ΤΑ PROFILE
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 ΘΑ ΒΡΟΥΜΕ ΤΑ ΠΡΟΦΙΛ ΠΑΝΩ ΑΠΟ ΤΑ 30 ΕΤΗ
+όπως είχαμε δει στις 2 προηγούμενες διαλέξεις gt = greater than
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile",
+      "age": {
+        "$gt": 30
+      }
+    }
+  }
+
+ΒΗΜΑ 3 ΕΠΕΚΤΑΣΗ ΤΟΥ ΒΗΜΑΤΟΣ 2 ΟΠΟΥ ΘΑ ΚΡΑΤΗΣΟΥΜΕ ΜΟΝΟ ΤΙΣ PREMIUM ΕΓΓΡΑΦΕΣ
+
+ΑΠΑΡΑΙΤΗΤΗ ΠΡΟΥΠΟΘΕΣΗ ΕΙΝΑΙ ΝΑ ΔΗΜΙΟΥΡΓΉΣΟΥΜΕ ΕΝΑΝ ΠΙΝΑΚΑ ΌΠΩς ΣΤΟ ΠΡΟΗΓΟΥΜΕΝΟ ΠΑΡΑΔΕΙΓΜΑ
+
+3.1 ΦΤΙΑΞΑΜΕ ΤΟΝ ΠΙΝΑΚΑ ΠΟΥ ΑΝΑΦΕΡΑΜΕ
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile",
+      "age": {
+        "$gt": 30
+      }
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "profile_id",
+      "as": "subs"
+    }
+  }
+])
+])
+
+3.2 ΠΡΟΣΟΧΗ ΠΑΛΙ ΣΤΗΝ ΕΝΤΟΛΗ subs.plan
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile",
+      "age": {
+        "$gt": 30
+      }
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "_id",
+      "foreignField": "profile_id",
+      "as": "subs"
+    }
+  },
+  {
+    "$match": {
+      "subs.plan": "Premium"
+    }
+  }
+])
+
+
+ΕΥΡΕΣΗ ΣΥΝΔΡΟΜΩΝ ΠΟΥ ΕΙΝΑΙ ΠΑΝΩ ΑΠΟ 10 ΕΥΡΩ ΚΑΙ ΣΕ ΠΟΙΟΝ ΑΝΗΚΟΥΝ
+
+ΒΗΜΑ 1 ΘΑ ΒΡΟΥΜΕ ΤΑ SUBS
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub"
+    }
+  }
+])
+
+BHMA 2 ΘΑ ΒΡΟΥΜΕ ΤΑ SUBS ΜΕ ΠΑΝΩ ΑΠΟ 10 ΕΥΡΩ
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub",
+      price: {
+        "$gt": 10
+      }
+    }
+  }
+])
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "sub",
+      price: {
+        "$gt": 10
+      }
+    }
+  },
+  {
+    "$lookup": {
+      "from": "collection",
+      "localField": "profile_id",
+      "foreignField": "_id",
+      "as": "my_subs"
+    }
+  }
+])
+
+
+ΟΤΑΝ ΚΑΝΩ ΠΡΩΤΑ TYPE SUB ΚΑΙ ΘΕΛΩ ΝΑ ΦΤΙΑΞΩ ΠΙΝΑΚΑ
+ΕΧΩ lOCALFIELD PROFILE_ID KAI FOREIGNFIELD _ID
+
+ΕΝΩ ΟΤΑΝ ΚΑΝΩ ΠΡΩΤΑ ΤΥΠΕ PROFILE ΚΑΙ ΘΕΛΩ ΝΑ ΦΤΙΑΞΩ ΠΙΚΑΝΑ
+ΕΧΩ LOCALFIELD _ID KAI FOREIGNFIEL PROFILE_ID
+
+ΣΗΜΑΝΤΙΚΗ ΛΕΠΤΟΜΕΡΙΑ , ΟΣΟ ΚΑΙ Η ΣΕΙΡΑ ΤΩΝ ΕΝΤΟΛΩΝ
+
+
+ΠΟΣΑ TAGS EXEI O ΚΑΘΕ ΧΡΗΣΤΗΣ
+
+ΒΗΜΑ 1 ΤΑ ΤΑGS ΑΝΗΚΟΥΝ ΣΤΟ TYPE PROFILE ΟΠΟΤΕ ΚΡΑΤΑΩ ΤΙΣ ΕΓΓΡΑΦΕΣ ΜΕ ΤΟ pROFILE
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  }
+])
+
+ΒΗΜΑ 2 ΔΗΜΙΟΥΡΓΙΑ ΕΝΟΣ ΝΕΟΥ ΠΕΔΙΟΥ TAG_COUNT ΤΟ ΟΠΟΙΟ ΘΑ ΜΕΤΡΑΕΙ ΠΟΣΕΣ ΕΓΓΡΑΦΕΣ TAGS ΥΠΑΡΧΟΥΝ
+
+addFields = Δημιουργία και εγγραφή νεόυ πεδίου στην βάση μας.
+tag_count είναι το όνομα που φέρει το νέο πεδίο που κατασκευάσαμε
+size είναι το μεγεθος του πίνακα tags όπου ισοδυναμεί με την απαντησή μας, 
+γιατί εμείς αυτό το πεδίο ψάχναμε εξ αρχής, πόσα tag έχει η κάθε εγγραφή μας
+
+db.collection.aggregate([
+  {
+    "$match": {
+      "type": "profile"
+    }
+  },
+  {
+    "$addFields": {
+      "tag_count": {
+        "$size": "$tags"
+      }
+    }
+  }
+])
+
