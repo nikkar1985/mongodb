@@ -160,3 +160,231 @@ async function run() {
 
 // Εκτέλεση της συνάρτησης
 run().catch((err) => console.error("❌ Σφάλμα:", err));
+
+
+
+
+ΔΗΜΙΟΥΡΓΙΑ HTML ΚΑΙ ΕΝΩΣΗ ΜΕ ΤΗΝ ΒΑΣΗ ΧΩΡΙΣ CSS
+
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const express = require("express");
+
+const app = express();
+const port = 3000;
+
+async function run() {
+  // 1. ΡΥΘΜΙΣΗ ΒΑΣΗΣ
+  const mongo = await MongoMemoryServer.create();
+  const uri = mongo.getUri();
+
+  await mongoose.connect(uri);
+  console.log("✅ Συνδεθήκαμε στη MongoDB!");
+
+  // 2. ΤΟ ΣΧΗΜΑ (SCHEMA)
+  const userSchema = new mongoose.Schema({
+    fullname: String,
+    age: Number,
+    isStudent: Boolean,
+  });
+
+  const User = mongoose.model("User", userSchema);
+
+  // 3. ΔΗΜΙΟΥΡΓΙΑ ΕΓΓΡΑΦΩΝ
+  await User.create([
+    { fullname: "Ελένη Κώστα", age: 20, city: "Athens", isStudent: true },
+    { fullname: "Νίκος Παππάς", age: 25, city: "Kavala" },
+    {
+      fullname: "Νίκος Παπαδόπουλος",
+      age: 30,
+      city: "Drama",
+      isStudent: false,
+    },
+  ]);
+
+  // 4. ROUTES
+  app.get("/", async (req, res) => {
+    // Παίρνουμε τους χρήστες μέσα στο route για να είναι πάντα ενημερωμένοι
+    const allUsers = await User.find();
+
+    let html = `<h1> Λίστα Χρηστών </h1>`;
+
+    allUsers.forEach((user) => {
+      html += `<div>${user.fullname} - Ηλικία: ${user.age} - Πόλη: ${user.city} </div>`;
+    });
+
+    res.send(html);
+  });
+
+  // 5. ΕΚΚΙΝΗΣΗ SERVER
+  app.listen(port, () => {
+    console.log(`🚀 Ο server τρέχει στο http://localhost:${port}`);
+  });
+}
+
+// Εκτέλεση και διαχείριση σφαλμάτων
+run().catch((err) => console.error("❌ Σφάλμα στην εκτέλεση:", err));
+
+
+ΤΟ ΙΔΙΟ ΜΕ CSS
+
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const express = require("express");
+
+const app = express();
+const port = 3000;
+
+async function run() {
+  // 1. ΡΥΘΜΙΣΗ ΒΑΣΗΣ
+  const mongo = await MongoMemoryServer.create();
+  const uri = mongo.getUri();
+
+  await mongoose.connect(uri);
+  console.log("✅ Συνδεθήκαμε στη MongoDB!");
+
+  // 2. ΤΟ ΣΧΗΜΑ (SCHEMA) - Προσθέσαμε το city
+  const userSchema = new mongoose.Schema({
+    fullname: String,
+    age: Number,
+    city: String,     // <--- Απαραίτητο για να εμφανιστεί!
+    isStudent: Boolean,
+  });
+
+  const User = mongoose.model("User", userSchema);
+
+  // 3. ΔΗΜΙΟΥΡΓΙΑ ΕΓΓΡΑΦΩΝ
+  await User.create([
+    { fullname: "Ελένη Κώστα", age: 20, city: "Athens", isStudent: true },
+    { fullname: "Νίκος Παππάς", age: 25, city: "Kavala", isStudent: false },
+    { fullname: "Νίκος Παπαδόπουλος", age: 30, city: "Drama", isStudent: false },
+  ]);
+
+  // 4. ROUTES
+  app.get("/", async (req, res) => {
+    const allUsers = await User.find();
+
+    let html = `
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        h1 { color: #2c3e50; }
+        .card { 
+          background: white; 
+          padding: 15px; 
+          margin-bottom: 10px; 
+          border-radius: 8px; 
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Λίστα Χρηστών</h1>`;
+
+    allUsers.forEach((user) => {
+      // Χρησιμοποιούμε user.city που τώρα υπάρχει στο Schema
+      html += `<div class="card"><strong>${user.fullname}</strong> - Ηλικία: ${user.age} - Πόλη: ${user.city || "Δεν δηλώθηκε"}</div>`;
+    });
+
+    html += `</body></html>`;
+    res.send(html);
+  });
+
+  // 5. ΕΚΚΙΝΗΣΗ SERVER
+  app.listen(port, () => {
+    console.log(`🚀 Ο server τρέχει στο http://localhost:${port}`);
+  });
+}
+
+run().catch((err) => console.error("❌ Σφάλμα στην εκτέλεση:", err));
+
+
+
+
+
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const express = require("express");
+
+const app = express();
+const port = 3000;
+
+async function run() {
+  // 1. ΡΥΘΜΙΣΗ ΒΑΣΗΣ
+  const mongo = await MongoMemoryServer.create();
+  const uri = mongo.getUri();
+
+  await mongoose.connect(uri);
+  console.log("✅ Συνδεθήκαμε στη MongoDB!");
+
+  // 2. ΤΟ ΣΧΗΜΑ (SCHEMA) - Προσθέσαμε το city
+  const userSchema = new mongoose.Schema({
+    fullname: String,
+    age: Number,
+    city: String, // <--- Απαραίτητο για να εμφανιστεί!
+    isStudent: Boolean,
+  });
+
+  const User = mongoose.model("User", userSchema);
+
+  // 3. ΔΗΜΙΟΥΡΓΙΑ ΕΓΓΡΑΦΩΝ
+  await User.create([
+    { fullname: "Ελένη Κώστα", age: 20, city: "Athens", isStudent: true },
+    { fullname: "Νίκος Παππάς", age: 25, city: "Kavala", isStudent: false },
+    {
+      fullname: "Νίκος Παπαδόπουλος",
+      age: 30,
+      city: "Drama",
+      isStudent: false,
+    },
+  ]);
+
+  // 4. ROUTES
+  app.get("/", async (req, res) => {
+    const allUsers = await User.find();
+
+    let html = `
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        p { color: #dddddd; }
+        h1 { color: #2c3e50; }
+        .check { color: #eeeeee; }
+        .card { 
+          background: white; 
+          padding: 15px; 
+          margin-bottom: 10px; 
+          border-radius: 8px; 
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+      </style>
+    </head>
+    <body>
+      <h1>Λίστα Χρηστών</h1>
+      <p> Παράδειγμα </p>
+      <p class="check"> Παράδειγμα2 </p>
+      `;
+
+    allUsers.forEach((user) => {
+      // Χρησιμοποιούμε user.city που τώρα υπάρχει στο Schema
+      html += `<div class="card"><strong>${user.fullname}</strong> - Ηλικία: ${
+        user.age
+      } - Πόλη: ${user.city || "Δεν δηλώθηκε"}</div>`;
+    });
+
+    html += `</body></html>`;
+    res.send(html);
+  });
+
+  // 5. ΕΚΚΙΝΗΣΗ SERVER
+  app.listen(port, () => {
+    console.log(`🚀 Ο server τρέχει στο http://localhost:${port}`);
+  });
+}
+
+run().catch((err) => console.error("❌ Σφάλμα στην εκτέλεση:", err));
+
