@@ -1713,3 +1713,113 @@ async function run() {
 
 run().catch(console.error);
 
+
+
+ΠΡΟΣΘΗΚΗ ΚΑΙ ΤΟΥ BOOLEAN ΠΟΥ ΛΕΓΑΜΕ ΟΤΙ ΔΕΝ ΒΑΛΑΜΕ 
+
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const express = require("express");
+
+const app = express();
+const port = 3000;
+
+app.use(express.urlencoded({ extended: true }));
+
+async function run() {
+  // 1. ΡΥΘΜΙΣΗ ΒΑΣΗΣ
+  const mongo = await MongoMemoryServer.create();
+  const uri = mongo.getUri();
+
+  await mongoose.connect(uri);
+  console.log("✅ Συνδεθήκαμε στη MongoDB!");
+
+  // 2. ΤΟ ΣΧΗΜΑ (SCHEMA)
+  const userSchema = new mongoose.Schema({
+    fullname: String,
+    age: Number,
+    city: String,
+    isStudent: Boolean, // Το πεδίο Boolean που ορίσαμε
+  });
+
+  const User = mongoose.model("User", userSchema);
+
+  // 4. ROUTES
+
+  app.get("/", async (req, res) => {
+    const allUsers = await User.find();
+
+    let html = `
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+            form { background: #f4f4f4; padding: 20px; border-radius: 8px; }
+            input, button { margin: 5px 0; display: block; padding: 8px; }
+            .checkbox-group { display: flex; align-items: center; gap: 10px; }
+            li { margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        </style>
+    </head>
+    <body>
+      <h1>Εγγραφή χρηστών</h1>
+      <form action="/add" method="POST">
+        <input type="text" name="fullname" placeholder="Όνομα" required>
+        <input type="number" name="age" placeholder="Ηλικία" required>
+        <input type="text" name="city" placeholder="Πόλη" required>
+        
+        <div class="checkbox-group">
+            <input type="checkbox" id="isStudent" name="isStudent">
+            <label for="isStudent">Είναι φοιτητής;</label>
+        </div>
+
+        <button type="submit" style="background: #28a745; color: white; border: none; cursor: pointer;">Προσθήκη</button>
+      </form>
+      
+      <h3>Λίστα στην Βάση:</h3>
+      <ul>
+        ${allUsers
+          .map(
+            (user) => `
+          <li>
+            <strong>${user.fullname}</strong>, 
+            ${user.age} ετών από <strong>${user.city}</strong> 
+            <br> 
+            <small>Κατάσταση: ${user.isStudent ? "🎓 Φοιτητής" : "💼 Εργαζόμενος/Άλλο"}</small>
+          </li>
+        `
+          )
+          .join("")}
+      </ul>
+    </body>
+    </html>
+    `;
+    res.send(html);
+  });
+
+  app.post("/add", async (req, res) => {
+    try {
+      // req.body.isStudent θα είναι "on" αν το checkbox είναι τσεκαρισμένο, αλλιώς undefined
+      const { fullname, age, city, isStudent } = req.body;
+
+      const newUser = new User({ 
+        fullname, 
+        age, 
+        city, 
+        isStudent: isStudent === "on" // Μετατροπή σε true/false
+      });
+
+      await newUser.save();
+      console.log(`👤 Προστέθηκε ο/η ${fullname}`);
+      res.redirect("/");
+    } catch (err) {
+      res.status(500).send("Σφάλμα κατά την αποθήκευση");
+    }
+  });
+
+  app.listen(port, () => {
+    console.log(`🚀 Ο server τρέχει στο http://localhost:${port}`);
+  });
+}
+
+run().catch((err) => console.error("❌ Σφάλμα στην εκτέλεση:", err));
