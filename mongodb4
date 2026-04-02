@@ -1,0 +1,162 @@
+ ΒΗΜΑ 1 https://codesandbox.io/
+ΒΗΜΑ 2 CREATE KAI ΕΠΙΛΕΓΟΥΜΕ node.js
+ΒΗΜΑ 3 npm install express mongoose mongodb-memory-server
+
+
+const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+
+async function run() {
+  // --- 1. ΡΥΘΜΙΣΗ ΒΑΣΗΣ (Η "ΑΠΟΘΗΚΗ" ΜΑΣ) ---
+  // Δημιουργούμε μια εικονική βάση στη μνήμη (RAM)
+  const mongo = await MongoMemoryServer.create();
+  const uri = mongo.getUri();
+
+  // Σύνδεση στη βάση
+  await mongoose.connect(uri);
+  console.log("✅ Συνδεθήκαμε στη MongoDB!");
+
+  // --- 2. ΤΟ ΣΧΗΜΑ (SCHEMA) ---
+  // Εδώ ορίζουμε τους κανόνες: Τι στοιχεία θα έχει ένας Χρήστης;
+  const userSchema = new mongoose.Schema({
+    fullname: String,
+    age: Number,
+    isStudent: Boolean
+  });
+
+  // Μετατρέπουμε το Σχήμα σε "Μοντέλο" για να μπορούμε να το χρησιμοποιήσουμε
+  const User = mongoose.model('User', userSchema);
+
+  // --- 3. ΔΗΜΙΟΥΡΓΙΑ ΕΓΓΡΑΦΗΣ (DOCUMENT) ---
+  // Φτιάχνουμε έναν συγκεκριμένο χρήστη
+  const student = new User({
+    fullname: "Μαρία Παπαδοπούλου",
+    age: 21,
+    isStudent: true
+  });
+
+  // Τον σώζουμε στη βάση (αυτό είναι το "Create" στο CRUD)
+  await student.save();
+  console.log("💾 Ο χρήστης αποθηκεύτηκε με επιτυχία!");
+
+  // --- 4. ΑΝΑΓΝΩΣΗ (READ) ---
+  // Ζητάμε από τη βάση να μας δείξει όλους τους χρήστες που βρήκε
+  const allUsers = await User.find();
+ 
+  console.log("🔍 Λίστα χρηστών στη βάση:");
+  console.log(allUsers);
+}
+
+// Εκτέλεση της συνάρτησης
+run().catch(err => console.error("❌ Σφάλμα:", err));
+
+
+
+Για εγγραφή πολλών χρηστών ΤΡΟΠΟΣ Ι
+
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+
+async function run() {
+  // --- 1. ΡΥΘΜΙΣΗ ΒΑΣΗΣ (Η "ΑΠΟΘΗΚΗ" ΜΑΣ) ---
+  // Δημιουργούμε μια εικονική βάση στη μνήμη (RAM)
+  const mongo = await MongoMemoryServer.create();
+  const uri = mongo.getUri();
+
+  // Σύνδεση στη βάση
+  await mongoose.connect(uri);
+  console.log("✅ Συνδεθήκαμε στη MongoDB!");
+
+  // --- 2. ΤΟ ΣΧΗΜΑ (SCHEMA) ---
+  // Εδώ ορίζουμε τους κανόνες: Τι στοιχεία θα έχει ένας Χρήστης;
+  const userSchema = new mongoose.Schema({
+    fullname: String,
+    age: Number,
+    isStudent: Boolean,
+  });
+
+  // Μετατρέπουμε το Σχήμα σε "Μοντέλο" για να μπορούμε να το χρησιμοποιήσουμε
+  const User = mongoose.model("User", userSchema);
+
+  // --- 3. ΔΗΜΙΟΥΡΓΙΑ ΕΓΓΡΑΦΗΣ (DOCUMENT) ---
+  // Φτιάχνουμε έναν συγκεκριμένο χρήστη
+  const student = new User({
+    fullname: "Μαρία Παπαδοπούλου",
+    age: 21,
+    isStudent: true,
+  });
+
+  // Τον σώζουμε στη βάση (αυτό είναι το "Create" στο CRUD)
+  await student.save();
+  console.log("💾 Ο χρήστης αποθηκεύτηκε με επιτυχία!");
+
+  const student1 = new User({
+    fullname: "Γεωργία Παπαδοπούλου",
+    age: 31,
+    isStudent: true,
+  });
+
+  // Τον σώζουμε στη βάση (αυτό είναι το "Create" στο CRUD)
+  await student1.save();
+  console.log("💾 Ο χρήστης αποθηκεύτηκε με επιτυχία!");
+
+  // --- 4. ΑΝΑΓΝΩΣΗ (READ) ---
+  // Ζητάμε από τη βάση να μας δείξει όλους τους χρήστες που βρήκε
+  const allUsers = await User.find();
+
+  console.log("🔍 Λίστα χρηστών στη βάση:");
+  console.log(allUsers);
+}
+
+// Εκτέλεση της συνάρτησης
+run().catch((err) => console.error("❌ Σφάλμα:", err));
+
+
+
+
+
+ΔΗΜΙΟΥΡΓΙΑ ΠΟΛΛΑΠΛΩΝ ΧΡΗΣΤΩΝ ΤΡΟΠΟΣ ΙΙ
+
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+
+async function run() {
+  // --- 1. ΡΥΘΜΙΣΗ ΒΑΣΗΣ (Η "ΑΠΟΘΗΚΗ" ΜΑΣ) ---
+  // Δημιουργούμε μια εικονική βάση στη μνήμη (RAM)
+  const mongo = await MongoMemoryServer.create();
+  const uri = mongo.getUri();
+
+  // Σύνδεση στη βάση
+  await mongoose.connect(uri);
+  console.log("✅ Συνδεθήκαμε στη MongoDB!");
+
+  // --- 2. ΤΟ ΣΧΗΜΑ (SCHEMA) ---
+  // Εδώ ορίζουμε τους κανόνες: Τι στοιχεία θα έχει ένας Χρήστης;
+  const userSchema = new mongoose.Schema({
+    fullname: String,
+    age: Number,
+    isStudent: Boolean,
+  });
+
+  // Μετατρέπουμε το Σχήμα σε "Μοντέλο" για να μπορούμε να το χρησιμοποιήσουμε
+  const User = mongoose.model("User", userSchema);
+
+  // --- 3. ΔΗΜΙΟΥΡΓΙΑ ΕΓΓΡΑΦΗΣ (DOCUMENT) ---
+
+  // Δημιουργία πολλών χρηστών ταυτόχρονα
+  await User.create([
+    { fullname: "Ελένη Κώστα", age: 20, isStudent: true },
+    { fullname: "Νίκος Παππάς", age: 25, isStudent: false },
+  ]);
+
+  console.log(" Προστέθηκαν επιπλέον χρήστες!");
+  // --- 4. ΑΝΑΓΝΩΣΗ (READ) ---
+  // Ζητάμε από τη βάση να μας δείξει όλους τους χρήστες που βρήκε
+  const allUsers = await User.find();
+
+  console.log("🔍 Λίστα χρηστών στη βάση:");
+  console.log(allUsers);
+}
+
+// Εκτέλεση της συνάρτησης
+run().catch((err) => console.error("❌ Σφάλμα:", err));
