@@ -388,3 +388,97 @@ async function run() {
 
 run().catch((err) => console.error("❌ Σφάλμα στην εκτέλεση:", err));
 
+
+ΠΡΟΣΘΕΤΕΙ Ο ΧΡΗΣΤΗΣ ΧΕΙΡΟΚΙΝΗΤΑ ΜΕΣΩ ΦΟΡΜΑΣ ΤΑ ΣΤΟΙΧΕΙΑ ΤΟΥ 
+
+const mongoose = require("mongoose");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const express = require("express");
+
+const app = express();
+const port = 3000;
+
+// Απαραίτητο για να μπορεί η Express να διαβάσει τα δεδομένα από το FORM
+app.use(express.urlencoded({ extended: true }));
+
+async function run() {
+  // 1. ΡΥΘΜΙΣΗ ΒΑΣΗΣ
+  const mongo = await MongoMemoryServer.create();
+  const uri = mongo.getUri();
+
+  await mongoose.connect(uri);
+  console.log("✅ Συνδεθήκαμε στη MongoDB!");
+
+  // 2. ΤΟ ΣΧΗΜΑ (SCHEMA)
+  const userSchema = new mongoose.Schema({
+    fullname: String,
+    age: Number,
+    city: String,
+    isStudent: Boolean,
+  });
+
+  // 3. ΤΟ ΜΟΝΤΕΛΟ (MODEL) - Αυτό έλειπε!
+  const User = mongoose.model("User", userSchema);
+
+  // 4. ROUTES
+
+  // Αρχική σελίδα: Εμφάνιση Φόρμας και Λίστας
+  app.get("/", async (req, res) => {
+    const allUsers = await User.find(); // Παίρνουμε όλους τους χρήστες
+
+    let html = `
+    <html>
+    <head><meta charset="UTF-8"></head>
+    <body>
+      <h1>Εγγραφή χρηστών</h1>
+      <form action="/add" method="POST">
+        <input type="text" name="fullname" placeholder="Όνομα" required>
+        <input type="number" name="age" placeholder="Ηλικία" required>
+        <input type="text" name="city" placeholder="Πόλη" required>
+        <button type="submit">Προσθήκη</button>
+      </form>
+      
+      <h3>Λίστα στην Βάση:</h3>
+      <ul>
+        ${allUsers
+          .map(
+            (user) => `
+          <li>
+            <strong>${user.fullname}</strong>, 
+            ${user.age} ετών από <strong>${user.city || "Άγνωστη πόλη"}</strong>
+          </li>
+        `
+          )
+          .join("")}
+      </ul>
+    </body>
+    </html>
+    `;
+    res.send(html);
+  });
+
+  // POST Route: Αποθήκευση νέου χρήστη
+  app.post("/add", async (req, res) => {
+    try {
+      const { fullname, age, city } = req.body;
+
+      // Δημιουργία και αποθήκευση
+      const newUser = new User({ fullname, age, city });
+      await newUser.save();
+
+      console.log("👤 Χρήστης προστέθηκε!");
+      res.redirect("/"); // Επιστροφή στην αρχική για να δούμε το αποτέλεσμα
+    } catch (err) {
+      res.status(500).send("Σφάλμα κατά την αποθήκευση");
+    }
+  });
+
+  // 5. ΕΚΚΙΝΗΣΗ SERVER
+  app.listen(port, () => {
+    console.log(`🚀 Ο server τρέχει στο http://localhost:${port}`);
+  });
+}
+
+run().catch((err) => console.error("❌ Σφάλμα στην εκτέλεση:", err));
+
+ΤΟ ΙΔΙΟ ΜΕ CSS
